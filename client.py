@@ -13,6 +13,9 @@ def upload_file(client_socket):
     print(f"Available file to upload: {files_list}")
 
     file_name = input("Enter the file's name: ")
+    while file_name not in files_list:
+        #A loop that runs until the file name exists.
+        file_name = input("There is no file with this name. ")
 
     with open(file_name, "rb") as file: #Opens the file and reads the content.
         data = file.read()
@@ -26,12 +29,11 @@ def receive_file(client_socket):
     files_list = json.loads(client_socket.recv(1024).decode('utf-8')) #The files available to download.
     print(f"Files avaiable: {files_list}")
 
-    while True:
+    file_chosen = input("Enter the file's name: ")
+    while file_chosen not in files_list:
         #A loop that runs until the wanted file exists.
-        file_chosen = input("Enter the file that you want to download: ")
-        if file_chosen in files_list:
-            break
-        print("This file does not exist. please choose an existing one. ")
+        file_chosen = input("There is no file with this name: ")
+
 
     client_socket.send(file_chosen.encode('utf-8')) #Sends the choice.
 
@@ -51,7 +53,7 @@ def receive_file(client_socket):
 def client(client_socket):
     while True:
         #A loop that runs until the client wants to exit the program.
-        os.system('cls') #Clears the cmd.
+        os.system('cls') #Clears the terminal.
         while True:
             #A loop that runs until the choice is valid.
             choice = input("""
@@ -61,7 +63,7 @@ download - get a file from the server.
 exit - exit the program. """)
             if choice.lower() == "upload" or choice.lower() == "download" or choice.lower() == "exit":
                 break
-            print("Invalid choice, choose on of the available choices. ")
+            print("Invalid choice, choose one of the available choices. ")
 
         client_socket.send(choice.encode('utf-8'))
 
@@ -72,7 +74,6 @@ exit - exit the program. """)
         elif choice.lower() == "exit":
             print("goodbye! ")
             break
-
 
 def connect_to_server():
     #Connects to the server with ssl.
@@ -86,10 +87,9 @@ def connect_to_server():
     ssl_socket.connect((IP, PORT))
     try:
         client(ssl_socket)
+        
     finally:
         ssl_socket.close()
-
-
 
 if __name__ == '__main__':
     connect_to_server()

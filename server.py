@@ -7,7 +7,7 @@ import json
 IP = "127.0.0.1"
 PORT = 12345
 
-files_folder = r"C:\Users\User\Desktop\files" #The path that holds the server's files.
+files_folder = r"C:\Users\User\Desktop\files" #The folder that holds the server's files.
 
 def receive_file(client_socket):
     """Receives a file from the client. """
@@ -21,14 +21,15 @@ def receive_file(client_socket):
             break
 
         file_packets += data
-    with open(os.path.join(files_folder, file_name), "w") as file: #Creates a file and writes in it.
-        file.write(file_packets.decode('utf-8'))
+
+    with open(os.path.join(files_folder, file_name), "wb") as file: #Creates a file and writes in it.
+        file.write(file_packets)
 
 
 def upload_file(client_socket):
     """Sends a file to the client. """
-    l_files = os.listdir(files_folder) #All of the files in the directory.
-    client_socket.send(json.dumps(l_files).encode('utf-8'))
+    files_list = os.listdir(files_folder) #All of the files in the directory.
+    client_socket.send(json.dumps(files_list).encode('utf-8'))
 
     file_name = client_socket.recv(1024).decode()
     file_path = os.path.join(files_folder, file_name) #The absolute path of the file.
